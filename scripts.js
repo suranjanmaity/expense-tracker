@@ -223,6 +223,104 @@ function deleteExpense(index) {
     updateChart();
 }
 
+function generatePDFReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Expense Report', 14, 22);
+
+    doc.setFontSize(12);
+    let yOffset = 30;
+    let totalExpense = 0;
+    let totalCredit = 0;
+
+    const sortedExpenses = expenses.filter(expense => new Date(expense.date).getFullYear() === currentDate.getFullYear())
+                                    .slice()
+                                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+    let currentMonth = '';
+    sortedExpenses.forEach(expense => {
+        if (expense.type === 'expense') {
+            totalExpense += expense.amount;
+        } else {
+            totalCredit += expense.amount;
+        }
+    });
+     // Add a box for total credit and total expenditure
+     doc.setDrawColor(0);
+     doc.setFillColor(240, 240, 240);
+     doc.rect(14, yOffset, 170, 20, 'F');
+     doc.setTextColor(0);
+     doc.setFont('helvetica', 'bold');
+     doc.text(`For Year: ${currentDate.getFullYear()}`, 20, yOffset + 10);
+     yOffset += 4;
+     doc.text('Total Expense:', 20, yOffset + 10);
+     doc.text(totalExpense.toFixed(2), 70, yOffset + 10);
+     doc.text('Total Credit:', 100, yOffset + 10);
+     doc.text(totalCredit.toFixed(2), 150, yOffset + 10);
+     yOffset += 5;
+    var thisMonthExpense = 0;
+    var thisMonthCredit = 0;
+    sortedExpenses.forEach(expense => {
+        const expenseDate = new Date(expense.date);
+        const monthYear = expenseDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        if (currentMonth !== monthYear) {
+            if(thisMonthExpense>0){
+                yOffset -= 10;
+                doc.text(`${currentMonth.split(" ")[0]} Total Expense:`, 20, yOffset + 10);
+                doc.text(thisMonthExpense.toFixed(2), 80, yOffset + 10, { align: 'right' });
+                thisMonthExpense = 0;
+            }
+            if(thisMonthCredit>0){
+                if(thisMonthExpense!=0)yOffset -= 10;
+                doc.text(`${currentMonth.split(" ")[0]} Total Credit:`, 100, yOffset + 10);
+                doc.text(thisMonthCredit.toFixed(2), 170, yOffset + 10, { align: 'right' });
+                thisMonthCredit = 0;
+            }
+            yOffset += 20;
+                    
+            currentMonth = monthYear;
+            doc.setFontSize(14);
+            doc.text(currentMonth, 14, yOffset);
+            yOffset += 10;
+            doc.setFontSize(12);
+            doc.text(`Date`, 14, yOffset);
+            doc.text(`Description`, 50, yOffset);
+            doc.text(`Type`, 120, yOffset);
+            doc.text(`Amount`, 150, yOffset);
+            yOffset += 10;
+        }
+
+        doc.text(`${expense.date}`, 14, yOffset);
+        doc.text(`${expense.description}`, 50, yOffset);
+        doc.text(`${expense.type}`, 120, yOffset);
+        doc.text(`${expense.amount.toFixed(2)}`, 190, yOffset,  { align: 'right' });
+        yOffset += 10;
+        if (expense.type === 'expense') {
+            thisMonthExpense += expense.amount;
+        } else {
+            thisMonthCredit += expense.amount;
+        }
+    });
+    // Display totals for the last month
+    if (thisMonthExpense > 0) {
+        yOffset -= 10;
+        doc.text(`${currentMonth.split(" ")[0]} Total Expense:`, 20, yOffset + 10);
+        doc.text(thisMonthExpense.toFixed(2), 80, yOffset + 10, { align: 'right' });
+        thisMonthExpense = 0;
+    }
+    if (thisMonthCredit > 0) {
+        if(thisMonthExpense!=0){
+            yOffset -= 10;
+        }
+        doc.text(`${currentMonth.split(" ")[0]} Total Credit:`, 100, yOffset + 10);
+        doc.text(thisMonthCredit.toFixed(2), 170, yOffset + 10, { align: 'right' });
+        thisMonthCredit = 0;
+    }
+    yOffset += 10;
+
+    doc.save('Expense_Report.pdf');
+}
 
     // Function to add a new expense
     function addExpense(event) {
@@ -348,11 +446,6 @@ function updateChart() {
     document.getElementById('chart-info').textContent = monthYear;
 }
 
-
-
-
-
-
 // Function to go to the previous month
 function goToPreviousMonth() {
     currentDate.setMonth(currentDate.getMonth() - 1);
@@ -372,7 +465,7 @@ function goToNextMonth() {
     searchInput.addEventListener('keyup', filterExpenses);
     prevMonthBtn.addEventListener('click', goToPreviousMonth);
     nextMonthBtn.addEventListener('click', goToNextMonth);
-    header.addEventListener('click',()=>location.reload())
+    header.addEventListener('click', generatePDFReport);
     
     // Function to activate a screen
     function activateScreen(screenId) {

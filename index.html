@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Subtle Heading -->
+        <header id="header">
+            <h1>Expense Tracker</h1>
+        </header>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Screen 1: Overview -->
+            <div id="screen-1" class="screen active">
+                <div id="graphical-section">
+                    <canvas id="expenseChart"></canvas>
+                    <div id="chart-info"></div>
+                    <div id="month-nav">
+                        <button id="prev-month">Previous Month</button>
+                        <button id="next-month">Next Month</button>
+                    </div>
+                </div>
+                <div id="summary-section">
+                    <h2>Today's Total</h2>
+                    <p>Expense: <span id="today-expense">$0</span></p>
+                    <p>Credit: <span id="today-credit">$0</span></p>
+                    <h2>This Month</h2>
+                    <p>Expense: <span id="month-expense">$0</span></p>
+                    <p>Credit: <span id="month-credit">$0</span></p>
+                    <h2>Yearly Total</h2>
+                    <p>Total Expense: <span id="yearly-expense">$0</span></p>
+                    <p>Total Credit: <span id="yearly-credit">$0</span></p>
+                </div>
+            </div>
+            <!-- Screen 2: Expense Details -->
+            <div id="screen-2" class="screen">
+                <input type="text" id="search-input" class="search-bar" placeholder="Search expenses">
+                <table id="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Expense rows will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Screen 3: Add Expense -->
+            <div id="screen-3" class="screen">
+                <form id="add-expense-form">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" required>
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" required>
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" required>
+                    <label for="type">Type:</label>
+                    <select id="type" required>
+                        <option value="expense">Expense</option>
+                        <option value="credit">Credit</option>
+                    </select>
+                    <button type="submit">Add Expense</button>
+                </form>
+            </div>
+        </div>
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <button id="btn-screen-1" class="nav-button">Overview</button>
+            <button id="btn-screen-2" class="nav-button">Details</button>
+            <button id="btn-screen-3" class="nav-button">Add Expense</button>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
